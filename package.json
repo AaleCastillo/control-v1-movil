@@ -1,0 +1,14 @@
+{
+  "name": "control-remoto-tv",
+  "version": "1.0.0",
+  "description": "Control remoto para Android TV por WiFi",
+  "private": true,
+  "scripts": {
+    "sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/cli": "^6.1.0",
+    "@capacitor/core": "^6.1.0"
+  }
+}
