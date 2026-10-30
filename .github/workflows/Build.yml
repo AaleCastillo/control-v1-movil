@@ -20,13 +20,25 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Preparar web
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+
       - name: Instalar dependencias
         run: npm install
 
-      - name: Crear proyecto Android y sincronizar
+      - name: Crear proyecto Android
+        run: npx cap add android
+
+      - name: Agregar plugin de conexion a la TV
         run: |
-          npx cap add android
-          npx cap sync android
+          D=android/app/src/main/java/com/miremoto/tv
+          mkdir -p $D
+          cp MainActivity.java TvRemotePlugin.java $D/
+
+      - name: Sincronizar
+        run: npx cap sync android
 
       - name: Compilar APK
         working-directory: android
