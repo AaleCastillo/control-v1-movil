@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Control Remoto TV</title>
+<style>
+:root{--bg:#2a2a2c;--bg2:#1c1c1e;--hi:#4a4a4e;--lo:#0d0d0e;--ink:#d8d8dc;--dim:#8a8a90;--acc:#7fb0ff;--red:#ff6b6b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#e4e4e8;--bg2:#d4d4da;--hi:#fff;--lo:#a9a9b3;--ink:#2a2a2e;--dim:#6b6b73;--acc:#2f6fe0;--red:#d93a3a}}
+:root[data-theme="light"]{--bg:#e4e4e8;--bg2:#d4d4da;--hi:#fff;--lo:#a9a9b3;--ink:#2a2a2e;--dim:#6b6b73;--acc:#2f6fe0;--red:#d93a3a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center;user-select:none}
+.app{width:100%;max-width:420px;padding:16px 20px 32px;display:flex;flex-direction:column;gap:22px}
+.top{display:flex;justify-content:space-between;align-items:center}
+.status{font-size:13px;color:var(--dim);display:flex;align-items:center;gap:8px;background:none;border:0;color:var(--dim);cursor:pointer}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--red)}
+.dot.on{background:#5fdc8a}
+.btn{border:0;cursor:pointer;color:var(--ink);background:linear-gradient(145deg,var(--hi),var(--bg2));box-shadow:6px 6px 14px var(--lo),-4px -4px 10px color-mix(in srgb,var(--hi) 60%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--ink) 8%,transparent);display:grid;place-items:center;transition:transform .08s,box-shadow .08s}
+.btn:active,.btn.p{transform:scale(.95);box-shadow:inset 4px 4px 10px var(--lo),inset -3px -3px 8px color-mix(in srgb,var(--hi) 50%,transparent)}
+.btn svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.round{width:60px;height:60px;border-radius:50%}
+.row{display:flex;justify-content:space-between;align-items:center}
+.power{color:var(--red)}
+/* D-pad */
+.pad{position:relative;width:min(300px,78vw);aspect-ratio:1;margin:0 auto;border-radius:50%;background:radial-gradient(circle at 30% 25%,var(--hi),var(--bg2) 70%);box-shadow:10px 10px 28px var(--lo),-6px -6px 18px color-mix(in srgb,var(--hi) 50%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--ink) 10%,transparent)}
+.pad .d{position:absolute;background:none;border:0;color:var(--dim);width:34%;height:30%;display:grid;place-items:center;cursor:pointer;border-radius:16px}
+.pad .d:active{color:var(--acc)}
+.pad .d svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.u{top:3%;left:33%}.dn{bottom:3%;left:33%}.l{left:2%;top:35%}.r{right:2%;top:35%}
+.ok{position:absolute;inset:34%;border-radius:50%;font-size:15px;letter-spacing:.08em;color:var(--ink);background:linear-gradient(145deg,var(--bg2),var(--hi));box-shadow:inset 3px 3px 10px var(--lo),0 0 0 6px color-mix(in srgb,var(--lo) 70%,transparent);border:0;cursor:pointer}
+.ok:active{color:var(--acc);box-shadow:inset 6px 6px 14px var(--lo),0 0 0 6px color-mix(in srgb,var(--lo) 70%,transparent)}
+/* volume */
+.vol{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:34px;background:var(--bg2);box-shadow:inset 4px 4px 10px var(--lo),inset -3px -3px 8px color-mix(in srgb,var(--hi) 40%,transparent)}
+.vol .round{width:48px;height:48px;flex:none}
+.vol input{flex:1;-webkit-appearance:none;appearance:none;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--acc) var(--v,50%),var(--lo) var(--v,50%));outline:0}
+.vol input::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(145deg,var(--hi),var(--bg2));box-shadow:2px 2px 6px var(--lo)}
+.vol input::-moz-range-thumb{width:28px;height:28px;border:0;border-radius:50%;background:var(--hi)}
+.lab{font-size:11px;color:var(--dim);text-align:center;margin-top:6px;letter-spacing:.06em}
+.mute.on{color:var(--red)}
+/* keyboard */
+.kb{display:flex;gap:10px}
+.kb input{flex:1;min-width:0;border:0;outline:0;border-radius:28px;padding:0 20px;height:52px;font-size:16px;color:var(--ink);background:var(--bg2);box-shadow:inset 4px 4px 10px var(--lo),inset -3px -3px 8px color-mix(in srgb,var(--hi) 40%,transparent)}
+.kb input::placeholder{color:var(--dim)}
+.kb .round{width:52px;height:52px;flex:none}
+.apps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.apps .btn{height:46px;border-radius:23px;font-size:13px;font-weight:600;color:#fff;background:linear-gradient(145deg,color-mix(in srgb,var(--c) 80%,#fff),var(--c))}
+.toast{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translate(-50%,40px);background:var(--bg2);color:var(--ink);padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;transition:.2s;box-shadow:4px 4px 12px var(--lo);pointer-events:none}
+.toast.s{opacity:1;transform:translate(-50%,0)}
+dialog{border:0;border-radius:26px;background:var(--bg);color:var(--ink);padding:22px;width:min(360px,92vw);box-shadow:0 20px 60px #000a}
+dialog::backdrop{background:#0008}
+dialog h3{margin:0 0 6px}dialog p{margin:0 0 14px;font-size:13px;color:var(--dim);line-height:1.45}
+dialog input{width:100%;height:46px;border:0;border-radius:23px;padding:0 18px;margin-bottom:10px;font-size:16px;color:var(--ink);background:var(--bg2);box-shadow:inset 3px 3px 8px var(--lo)}
+dialog .btn{width:100%;height:46px;border-radius:23px}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="top">
+    <button class="btn round" data-k="POWER" aria-label="Encender o apagar"><svg viewBox="0 0 24 24" class="power"><path d="M12 3v8M6.3 6.8a8 8 0 1 0 11.4 0"/></svg></button>
+    <button class="status" id="st"><span class="dot" id="dot"></span><span id="stt">Sin conexión</span></button>
+  </div>
+
+  <div class="pad">
+    <button class="d u" data-k="DPAD_UP" aria-label="Arriba"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+    <button class="d dn" data-k="DPAD_DOWN" aria-label="Abajo"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+    <button class="d l" data-k="DPAD_LEFT" aria-label="Izquierda"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button class="d r" data-k="DPAD_RIGHT" aria-label="Derecha"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    <button class="ok" data-k="DPAD_CENTER">OK</button>
+  </div>
+
+  <div class="row">
+    <div><button class="btn round" data-k="BACK" aria-label="Atrás"><svg viewBox="0 0 24 24"><path d="M9 7L4 12l5 5M4 12h10a6 6 0 0 1 6 6"/></svg></button><div class="lab">ATRÁS</div></div>
+    <div><button class="btn round" data-k="HOME" aria-label="Inicio"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4zM10 20v-6h4v6"/></svg></button><div class="lab">INICIO</div></div>
+    <div><button class="btn round" data-k="MENU" aria-label="Menú"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><div class="lab">MENÚ</div></div>
+    <div><button class="btn round" data-k="TV_INPUT" aria-label="Entrada"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button><div class="lab">ENTRADA</div></div>
+  </div>
+
+  <div class="vol">
+    <button class="btn round mute" id="mute" data-k="MUTE" aria-label="Silenciar"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM17 9l4 6M21 9l-4 6"/></svg></button>
+    <input type="range" id="vol" min="0" max="100" value="30" aria-label="Volumen">
+    <span id="vv" style="width:30px;text-align:right;font-size:14px;color:var(--dim)">30</span>
+  </div>
+
+  <div class="row">
+    <button class="btn round" data-k="MEDIA_REWIND" aria-label="Retroceder"><svg viewBox="0 0 24 24"><path d="M11 6l-7 6 7 6zM20 6l-7 6 7 6z"/></svg></button>
+    <button class="btn round" data-k="MEDIA_PLAY_PAUSE" aria-label="Reproducir o pausar"><svg viewBox="0 0 24 24"><path d="M7 5l10 7-10 7zM5 5v0"/></svg></button>
+    <button class="btn round" data-k="MEDIA_STOP" aria-label="Detener"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+    <button class="btn round" data-k="MEDIA_FAST_FORWARD" aria-label="Adelantar"><svg viewBox="0 0 24 24"><path d="M13 6l7 6-7 6zM4 6l7 6-7 6z"/></svg></button>
+  </div>
+
+  <div class="row">
+    <button class="btn round" data-k="CHANNEL_DOWN" aria-label="Canal abajo"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+    <span style="font-size:12px;letter-spacing:.1em;color:var(--dim)">CANAL</span>
+    <button class="btn round" data-k="CHANNEL_UP" aria-label="Canal arriba"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+  </div>
+
+  <div class="kb">
+    <input id="txt" type="text" placeholder="Escribir en la TV…" autocomplete="off" autocapitalize="off" enterkeyhint="send">
+    <button class="btn round" id="bs" aria-label="Borrar"><svg viewBox="0 0 24 24"><path d="M9 6h11v12H9l-5-6zM12 9l5 6M17 9l-5 6"/></svg></button>
+    <button class="btn round" id="en" aria-label="Enter"><svg viewBox="0 0 24 24"><path d="M20 6v6a3 3 0 0 1-3 3H5M9 10l-4 5 4 5"/></svg></button>
+  </div>
+
+  <div class="apps">
+    <button class="btn" data-app="youtube" style="--c:#ff0000">YouTube</button>
+    <button class="btn" data-app="netflix" style="--c:#e50914">Netflix</button>
+    <button class="btn" data-app="prime" style="--c:#00a8e1">Prime</button>
+    <button class="btn" data-app="disney" style="--c:#113ccf">Disney+</button>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<dialog id="dlg">
+  <h3>Conectar a la TV</h3>
+  <p id="dmsg">Teléfono y TV en la misma red WiFi.</p>
+  <div id="list"></div>
+  <input id="ip" inputmode="decimal" placeholder="O escribe la IP de la TV (opcional)">
+  <input id="code" placeholder="Código de 6 caracteres de la TV" maxlength="6" autocapitalize="characters" hidden>
+  <button class="btn" id="go">Buscar TV</button>
+</dialog>
+
+<script>
+/* ===== Conexión real (plugin nativo TvRemote) ===== */
+const P = (window.Capacitor && Capacitor.registerPlugin) ? Capacitor.registerPlugin('TvRemote') : null;
+const TV = {
+  key(k){ if(P) P.sendKey({key:k}).catch(()=>setOff()); },
+  text(t){ if(P) P.sendText({text:t}).catch(()=>{}); },
+  app(a){ if(P) P.openApp({app:a}).catch(()=>{}); }
+};
+
+const $ = s => document.querySelector(s);
+const toast = m => { const t=$('#toast'); t.textContent=m; t.classList.add('s'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('s'),1100); };
+const buzz = (n=12) => { try{ navigator.vibrate && navigator.vibrate(n); }catch(e){} };
+const send = k => { buzz(); TV.key(k); toast(k.replace(/_/g,' ')); };
+
+/* Botones con repetición al mantener (flechas, canal) */
+document.querySelectorAll('[data-k]').forEach(b=>{
+  const k=b.dataset.k, rep=/DPAD_(UP|DOWN|LEFT|RIGHT)|CHANNEL/.test(k); let iv,to;
+  const stop=()=>{clearTimeout(to);clearInterval(iv);b.classList.remove('p')};
+  b.addEventListener('pointerdown',e=>{ e.preventDefault(); b.classList.add('p');
+    if(k==='MUTE'){ b.classList.toggle('on'); }
+    send(k); if(rep) to=setTimeout(()=>iv=setInterval(()=>send(k),130),380); });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,stop));
+});
+
+/* Volumen deslizable: envía pasos subir/bajar según el movimiento */
+const vol=$('#vol'); let last=+vol.value;
+const paint=()=>{ vol.style.setProperty('--v',vol.value+'%'); $('#vv').textContent=vol.value; };
+vol.addEventListener('input',()=>{ const d=+vol.value-last; const k=d>0?'VOLUME_UP':'VOLUME_DOWN';
+  for(let i=0;i<Math.abs(d);i++) TV.key(k); last=+vol.value; paint(); if(Math.abs(d)>0) buzz(6); });
+paint();
+
+/* Teclado: envía solo lo nuevo que se escribe */
+const txt=$('#txt'); let prev='';
+txt.addEventListener('input',()=>{ const v=txt.value;
+  if(v.startsWith(prev)) TV.text(v.slice(prev.length));
+  else { for(let i=0;i<prev.length;i++) TV.key('DEL'); TV.text(v); }
+  prev=v; });
+$('#bs').onclick=()=>{ send('DEL'); txt.value=txt.value.slice(0,-1); prev=txt.value; };
+const enter=()=>{ send('ENTER'); txt.value=''; prev=''; };
+$('#en').onclick=enter;
+txt.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); enter(); }});
+
+document.querySelectorAll('[data-app]').forEach(b=>b.onclick=()=>{ buzz(); TV.app(b.dataset.app); toast('Abriendo '+b.textContent); });
+
+/* Conexión automática */
+const dlg=$('#dlg'), msg=m=>$('#dmsg').textContent=m;
+const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+let pending=null;
+function setOn(h){ $('#dot').classList.add('on'); $('#stt').textContent=h; store.set('tvhost',h); }
+function setOff(){ $('#dot').classList.remove('on'); $('#stt').textContent='Sin conexión'; }
+async function connectTo(host){
+  if(!P){ msg('Esto solo funciona en la app instalada (APK).'); return; }
+  msg('Conectando…');
+  try{ await P.connect({host}); setOn(host); dlg.close(); toast('Conectado'); }
+  catch(e){ try{ await P.startPairing({host}); pending=host; msg('Escribe el código que aparece en tu TV.');
+      $('#code').hidden=false; $('#code').focus(); $('#go').textContent='Emparejar'; }
+    catch(e2){ msg('No se pudo llegar a la TV. Revisa que esté encendida y en el mismo WiFi.'); } }
+}
+async function scan(){
+  if(!P){ msg('Esto solo funciona en la app instalada (APK).'); return; }
+  msg('Buscando TVs en tu red…'); $('#list').innerHTML='';
+  try{ const r=await P.discover(); const d=r.devices||[];
+    if(!d.length){ msg('No encontré TVs. Escribe la IP abajo.'); return; }
+    if(d.length===1){ connectTo(d[0].host); return; }
+    msg('Elige tu TV:');
+    d.forEach(x=>{ const b=document.createElement('button'); b.className='btn'; b.style.marginBottom='8px'; b.textContent=x.name+' · '+x.host; b.onclick=()=>connectTo(x.host); $('#list').appendChild(b); });
+  }catch(e){ msg('Error al buscar. Escribe la IP de la TV.'); }
+}
+$('#st').onclick=()=>{ dlg.showModal(); scan(); };
+$('#go').onclick=async()=>{
+  if(pending){ try{ await P.finishPairing({code:$('#code').value.trim()}); const h=pending; pending=null; $('#code').hidden=true; $('#go').textContent='Buscar TV'; connectTo(h); }
+    catch(e){ msg('Código incorrecto. Revisa la TV e inténtalo otra vez.'); } return; }
+  const ip=$('#ip').value.trim(); if(ip) connectTo(ip); else scan();
+};
+const saved=store.get('tvhost'); if(P&&saved) P.connect({host:saved}).then(()=>setOn(saved)).catch(()=>{});
+</script>
+</body>
+</html>
